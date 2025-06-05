@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kit de Herramientas de Campeón Mental - Tenis de Mesa</title>
+    <!-- Chosen Palette: Calm Harmony Palette -->
+    <!-- Application Structure Plan: The SPA is designed as a guided "Mental Training Toolkit" with vertical sections. This non-linear dashboard approach allows users to explore tools as needed, but the layout follows a logical progression: 1) Header & Navigation for easy access. 2) Understanding Habits (interactive card flip) to compare old vs. new behaviors. 3) Core Tools (breathing & anchor words) for practical application. 4) Progress Tracking (interactive diary with a chart) to see growth. 5) Commitment (digital contract) to solidify intent. This structure is more engaging and task-oriented than a simple document list, making psychological concepts more accessible and actionable for young athletes. -->
+    <!-- Visualization & Content Choices: 
+        - Habit Cycle: Goal: Compare. Method: Two-sided card (HTML/CSS/JS) to flip between the old and new habit. Justification: Interactively demonstrates the concept of replacing a routine. Library: Vanilla JS.
+        - Breathing Guide: Goal: Inform/Process. Method: CSS-animated circle synchronized with JS timers to guide the 4-7-8 technique visually. Justification: An animated guide is far more effective for teaching a physical exercise than static text. Library: Vanilla JS.
+        - Anchor Words: Goal: Inform. Method: Interactive card carousel. Justification: Mimics flashcards, making it a fun, repeatable tool for reinforcement. Library: Vanilla JS.
+        - Emotions Diary: Goal: Organize/Change. Method: HTML form feeding data into a dynamic Chart.js bar chart. Justification: Provides instant visual feedback on emotional patterns, making tracking tangible and insightful. Library: Chart.js.
+        - Champion's Contract: Goal: Engage. Method: Interactive form where the user's name is dynamically inserted into the contract text. Justification: Personalizes the commitment, increasing its psychological impact. Library: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .card-container { perspective: 1000px; }
+        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.8s; transform-style: preserve-3d; }
+        .card-container.is-flipped .card-inner { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1.5rem; border-radius: 0.75rem; }
+        .card-front { background-color: #f8fafc; border: 1px solid #e2e8f0; }
+        .card-back { background-color: #e0f2f1; border: 1px solid #b2dfdb; transform: rotateY(180deg); }
+        .breathing-circle { transition: transform 4s linear, background-color 1s; }
+        .breathing-circle.inhale { transform: scale(1.5); background-color: #818cf8; }
+        .breathing-circle.hold { transform: scale(1.5); background-color: #facc15; }
+        .breathing-circle.exhale { transform: scale(1); background-color: #a5f3fc; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-indigo-600">🏆 Mente de Campeón</h1>
+                </div>
+                <nav class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#habitos" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Hábitos</a>
+                        <a href="#herramientas" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Herramientas</a>
+                        <a href="#diario" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Diario</a>
+                        <a href="#contrato" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Contrato</a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <section id="hero" class="text-center py-16">
+            <h2 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">Kit de Herramientas para el <span class="text-indigo-600">Atleta Mental</span></h2>
+            <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                Creado por el Lic. Carlos López para ayudarte a controlar tus emociones y alcanzar tu máximo potencial en el tenis de mesa.
+            </p>
+        </section>
+
+        <div class="space-y-16">
+
+            <section id="habitos" class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-2">Comprende y Transforma tu Hábito</h3>
+                <p class="text-center text-gray-600 mb-8">Un hábito tiene tres partes: la señal, la rutina y la recompensa. Para cambiar un mal hábito, debemos mantener la misma señal y recompensa, pero cambiar la rutina.</p>
+                
+                <div class="card-container w-full max-w-lg mx-auto h-80">
+                    <div class="card-inner">
+                        <div class="card-face card-front">
+                            <h4 class="text-xl font-semibold mb-4 text-red-600">Mi Antiguo Ciclo del Hábito</h4>
+                            <div class="text-left w-full">
+                                <p class="mb-2"><strong>Señal:</strong> Cuando fallo un punto...</p>
+                                <p class="mb-2"><strong>Rutina:</strong> Me enojo, salto, lloro...</p>
+                                <p><strong>Recompensa:</strong> Saco la frustración...</p>
+                            </div>
+                        </div>
+                        <div class="card-face card-back">
+                             <h4 class="text-xl font-semibold mb-4 text-green-600">Mi Nueva Rutina Mental</h4>
+                            <div class="text-left w-full">
+                                <p class="mb-2"><strong>Señal:</strong> Cuando fallo un punto...</p>
+                                <p class="mb-2"><strong>Nueva Rutina:</strong> Respiro 3 veces y digo: "Siguiente punto"</p>
+                                <p><strong>Nueva Recompensa:</strong> Me siento tranquila y lista.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-6">
+                    <button id="flipCardBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">
+                        Ver Mi Nueva Rutina
+                    </button>
+                </div>
+            </section>
+
+            <section id="herramientas" class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-8">Herramientas para la Calma</h3>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4 text-center">Respiración Consciente 4-7-8</h4>
+                        <p class="text-center text-gray-600 mb-6">Usa esta técnica para calmarte antes de jugar o entre puntos. Inhala 4s, aguanta 7s, exhala 8s. Repite 3 veces.</p>
+                        <div class="flex flex-col items-center">
+                            <div id="breathingCircle" class="w-40 h-40 bg-cyan-200 rounded-full flex items-center justify-center text-center breathing-circle">
+                                <span id="breathingText" class="text-xl font-semibold text-slate-700">Presiona Iniciar</span>
+                            </div>
+                            <button id="startBreathingBtn" class="mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">Iniciar</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4 text-center">Palabras Ancla</h4>
+                        <p class="text-center text-gray-600 mb-6">Estas son frases cortas que te puedes repetir para mantenerte enfocado y positivo. Haz clic para ver la siguiente.</p>
+                        <div id="anchorCard" class="bg-amber-100 border border-amber-300 h-40 rounded-lg flex items-center justify-center p-4 text-center cursor-pointer shadow-inner">
+                            <p id="anchorText" class="text-2xl font-bold text-amber-800"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="diario" class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-2">Diario de Emociones Semanal</h3>
+                <p class="text-center text-gray-600 mb-8">Registra cómo te sientes después de entrenar o competir. Esto te ayudará a ver tu progreso.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">Nuevo Registro</h4>
+                        <form id="emotionForm" class="space-y-4">
+                            <div>
+                                <label for="diaryDay" class="block text-sm font-medium text-gray-700">Día</label>
+                                <select id="diaryDay" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                    <option>Lunes</option>
+                                    <option>Martes</option>
+                                    <option>Miércoles</option>
+                                    <option>Jueves</option>
+                                    <option>Viernes</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="diaryFeeling" class="block text-sm font-medium text-gray-700">¿Cómo me sentí?</label>
+                                <div class="mt-2 flex space-x-4">
+                                    <label class="inline-flex items-center"><input type="radio" name="feeling" value="Feliz" class="text-indigo-600"> <span class="ml-2 text-2xl">😊</span></label>
+                                    <label class="inline-flex items-center"><input type="radio" name="feeling" value="Neutral" class="text-indigo-600"> <span class="ml-2 text-2xl">😐</span></label>
+                                    <label class="inline-flex items-center"><input type="radio" name="feeling" value="Enojado" class="text-indigo-600"> <span class="ml-2 text-2xl">😠</span></label>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition">Añadir al Diario</button>
+                        </form>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">Resumen de tu Semana</h4>
+                        <div class="chart-container">
+                            <canvas id="emotionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                 <div id="diaryLog" class="mt-8">
+                    <h4 class="text-lg font-semibold mb-2">Tus Registros:</h4>
+                    <ul id="diaryList" class="list-disc list-inside text-gray-600"></ul>
+                 </div>
+            </section>
+
+            <section id="contrato" class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-8">Contrato de Campeón/a Mental</h3>
+                <div class="max-w-2xl mx-auto bg-slate-100 p-6 rounded-lg border border-slate-200">
+                    <p class="mb-4">Yo, <span id="contractNameDisplay" class="font-bold border-b border-dotted border-gray-500 pb-1">____________________</span>, me comprometo a:</p>
+                    <ul class="list-disc list-inside space-y-2 mb-6">
+                        <li>✅ Reconocer cuando me enojo</li>
+                        <li>✅ Usar mi palabra ancla</li>
+                        <li>✅ Calmarme para seguir jugando</li>
+                    </ul>
+                    <div class="flex justify-between items-center">
+                        <p><strong>Firma:</strong> <span id="contractSignature" class="font-bold font-serif italic">Tu Nombre</span></p>
+                        <p><strong>Fecha:</strong> <span id="contractDate" class="font-bold"></span></p>
+                    </div>
+                </div>
+                <div class="mt-6 max-w-2xl mx-auto">
+                    <label for="userName" class="block text-sm font-medium text-gray-700">Escribe tu nombre para firmar</label>
+                    <input type="text" id="userName" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" placeholder="Tu Nombre Aquí">
+                </div>
+            </section>
+
+        </div>
+    </main>
+    
+    <footer class="bg-gray-800 mt-16">
+        <div class="container mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-white">
+             <p>Material diseñado por: Lic. Carlos López - Psicólogo Deportivo & Entrenador Mental</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Card Flip Logic
+            const flipCardBtn = document.getElementById('flipCardBtn');
+            const cardContainer = document.querySelector('.card-container');
+            flipCardBtn.addEventListener('click', () => {
+                cardContainer.classList.toggle('is-flipped');
+                if (cardContainer.classList.contains('is-flipped')) {
+                    flipCardBtn.textContent = 'Ver Antiguo Hábito';
+                } else {
+                    flipCardBtn.textContent = 'Ver Mi Nueva Rutina';
+                }
+            });
+
+            // Breathing Animator Logic
+            const breathingCircle = document.getElementById('breathingCircle');
+            const breathingText = document.getElementById('breathingText');
+            const startBreathingBtn = document.getElementById('startBreathingBtn');
+            let breathingInterval;
+
+            startBreathingBtn.addEventListener('click', () => {
+                startBreathingBtn.disabled = true;
+                startBreathingBtn.textContent = 'Respirando...';
+                
+                const sequence = [
+                    { state: 'Inhala', duration: 4000, className: 'inhale' },
+                    { state: 'Aguanta', duration: 7000, className: 'hold' },
+                    { state: 'Exhala', duration: 8000, className: 'exhale' }
+                ];
+                let currentStep = 0;
+
+                function runSequence() {
+                    const step = sequence[currentStep];
+                    breathingText.textContent = step.state;
+                    breathingCircle.className = 'w-40 h-40 rounded-full flex items-center justify-center text-center breathing-circle ' + step.className;
+                    
+                    currentStep = (currentStep + 1) % sequence.length;
+                    setTimeout(runSequence, step.duration);
+                }
+                
+                runSequence();
+            });
+
+
+            // Anchor Words Logic
+            const anchorWords = ["Siguiente punto", "Respira y sigue", "Yo soy fuerte", "Calma", "Voy a lograrlo"];
+            let currentAnchorIndex = 0;
+            const anchorCard = document.getElementById('anchorCard');
+            const anchorText = document.getElementById('anchorText');
+
+            function showAnchorWord() {
+                anchorText.textContent = anchorWords[currentAnchorIndex];
+            }
+            showAnchorWord();
+
+            anchorCard.addEventListener('click', () => {
+                currentAnchorIndex = (currentAnchorIndex + 1) % anchorWords.length;
+                showAnchorWord();
+            });
+
+
+            // Emotion Diary & Chart Logic
+            const emotionForm = document.getElementById('emotionForm');
+            const diaryList = document.getElementById('diaryList');
+            const emotionData = { 'Feliz': 0, 'Neutral': 0, 'Enojado': 0 };
+
+            const ctx = document.getElementById('emotionChart').getContext('2d');
+            const emotionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['😊 Feliz', '😐 Neutral', '😠 Enojado'],
+                    datasets: [{
+                        label: 'Frecuencia de Emociones',
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            'rgba(74, 222, 128, 0.6)',
+                            'rgba(251, 191, 36, 0.6)',
+                            'rgba(239, 68, 68, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(74, 222, 128, 1)',
+                            'rgba(251, 191, 36, 1)',
+                            'rgba(239, 68, 68, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            function updateChart() {
+                emotionChart.data.datasets[0].data = [emotionData['Feliz'], emotionData['Neutral'], emotionData['Enojado']];
+                emotionChart.update();
+            }
+
+            emotionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const day = document.getElementById('diaryDay').value;
+                const feelingRadio = document.querySelector('input[name="feeling"]:checked');
+                
+                if (!feelingRadio) {
+                    alert('Por favor, selecciona cómo te sentiste.');
+                    return;
+                }
+                const feeling = feelingRadio.value;
+                
+                emotionData[feeling]++;
+                
+                const listItem = document.createElement('li');
+                listItem.textContent = `${day}: Te sentiste ${feeling}.`;
+                diaryList.appendChild(listItem);
+                
+                updateChart();
+                emotionForm.reset();
+            });
+
+
+            // Contract Logic
+            const userNameInput = document.getElementById('userName');
+            const contractNameDisplay = document.getElementById('contractNameDisplay');
+            const contractSignature = document.getElementById('contractSignature');
+            const contractDate = document.getElementById('contractDate');
+
+            userNameInput.addEventListener('input', (e) => {
+                const name = e.target.value;
+                if(name.trim() !== ''){
+                    contractNameDisplay.textContent = name;
+                    contractSignature.textContent = name;
+                } else {
+                    contractNameDisplay.textContent = '____________________';
+                    contractSignature.textContent = 'Tu Nombre';
+                }
+            });
+
+            contractDate.textContent = new Date().toLocaleDateString('es-ES');
+        });
+    </script>
+</body>
+</html>
