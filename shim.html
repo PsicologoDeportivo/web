@@ -1,0 +1,788 @@
+
+<!-- saved from url=(0132)blob:https://1o6z90f5k12tcsoxflq9p5066w44t94gg4133ghhofzdu8um60-h763805538.scf.usercontent.goog/3a11ca42-2d53-42be-a618-ec6eb8455232 -->
+<html lang="es" class="scroll-smooth"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script>(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjhmODcxYTU0ODRjYWM0MjU5NTBiNzhiNGZhNWMxZGZlMjkzYjgwYWEiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6XC9cL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbVwvZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwODY4NjcxMDM3NTU4MDc2MzI2OCIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJleHAiOjE3NDkwODg5ODMsImlhdCI6MTc0OTA4NTM4MywiYWxnIjoiUlMyNTYifQ.aXGINbSqDPVnHTmTjav8XDZxiV2nGnclfHStMjkHFEp10txjsArL_znpAyVciSqdCyY7962T8DWPs6XXZZuPaTRB4bfcFRSi-m8S8S9WxvePHgOxloirt87DOepodceZoVu6AlSZoPR3yIpTbcse5AHscf5iCyhD48_RsDEe-_cLt6hzHF9xe4-57AcbndkvzkexgRekje-CxYc0WQyuC9TVXpcfXnDv3f2SqI1wW_Gr0WvTjdaqEv5nOeAc7shUgazkCggKEcRG1w-aVa_Fi1qbFqySa2dn0yjO6coojnZzf1JqpMh6k6WIzULhLMAaC57KQ1opYKRU6NfUobeegQ","922b52b7cb08-herramientas_psicologia_deportiva_tenis_mesa-221")</script><script>(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script>let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          const mediaPromiseId = nextMediaPromiseId++;
+          const promise = new Promise((resolve, reject) => {
+            pendingMediaResolvers[mediaPromiseId] = (granted) => {
+              delete pendingMediaResolvers[mediaPromiseId];
+              if (granted) {
+                if (originalGetUserMedia) {
+                  originalGetUserMedia(constraints).then(resolve).catch(reject);
+                } else {
+                  reject(new Error("Original getUserMedia not available."));
+                }
+              } else {
+              reject(new DOMException('Permission denied', 'NotAllowedError'));
+            }
+          };
+        });
+
+        window.parent.postMessage({
+          type: 'requestMediaPermission',
+          constraints: constraints,
+          promiseId: mediaPromiseId,
+        }, '*');
+
+        return promise;
+      },
+      writable: false,
+      configurable: false
+    });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script>((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-2.5-flash-preview-04-17","imageModelName":"imagen-3.0-generate-002","videoModelName":"veo-2.0-generate-001","deprecatedTextModelNames":["gemini-2.0-flash"]})</script><script>(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kit de Herramientas de Campeón Mental - Tenis de Mesa</title>
+    <!-- Chosen Palette: Calm Harmony Palette -->
+    <!-- Application Structure Plan: The SPA is designed as a guided "Mental Training Toolkit" with vertical sections. This non-linear dashboard approach allows users to explore tools as needed, but the layout follows a logical progression: 1) Header & Navigation for easy access. 2) Understanding Habits (interactive card flip) to compare old vs. new behaviors. 3) Core Tools (breathing & anchor words) for practical application. 4) Progress Tracking (interactive diary with a chart) to see growth. 5) Commitment (digital contract) to solidify intent. This structure is more engaging and task-oriented than a simple document list, making psychological concepts more accessible and actionable for young athletes. -->
+    <!-- Visualization & Content Choices: 
+        - Habit Cycle: Goal: Compare. Method: Two-sided card (HTML/CSS/JS) to flip between the old and new habit. Justification: Interactively demonstrates the concept of replacing a routine. Library: Vanilla JS.
+        - Breathing Guide: Goal: Inform/Process. Method: CSS-animated circle synchronized with JS timers to guide the 4-7-8 technique visually. Justification: An animated guide is far more effective for teaching a physical exercise than static text. Library: Vanilla JS.
+        - Anchor Words: Goal: Inform. Method: Interactive card carousel. Justification: Mimics flashcards, making it a fun, repeatable tool for reinforcement. Library: Vanilla JS.
+        - Emotions Diary: Goal: Organize/Change. Method: HTML form feeding data into a dynamic Chart.js bar chart. Justification: Provides instant visual feedback on emotional patterns, making tracking tangible and insightful. Library: Chart.js.
+        - Champion's Contract: Goal: Engage. Method: Interactive form where the user's name is dynamically inserted into the contract text. Justification: Personalizes the commitment, increasing its psychological impact. Library: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" crossorigin="anonymous"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .card-container { perspective: 1000px; }
+        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.8s; transform-style: preserve-3d; }
+        .card-container.is-flipped .card-inner { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1.5rem; border-radius: 0.75rem; }
+        .card-front { background-color: #f8fafc; border: 1px solid #e2e8f0; }
+        .card-back { background-color: #e0f2f1; border: 1px solid #b2dfdb; transform: rotateY(180deg); }
+        .breathing-circle { transition: transform 4s linear, background-color 1s; }
+        .breathing-circle.inhale { transform: scale(1.5); background-color: #818cf8; }
+        .breathing-circle.hold { transform: scale(1.5); background-color: #facc15; }
+        .breathing-circle.exhale { transform: scale(1); background-color: #a5f3fc; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.sticky{position:sticky}.top-0{top:0px}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-10{margin-left:2.5rem}.ml-2{margin-left:0.5rem}.mt-1{margin-top:0.25rem}.mt-16{margin-top:4rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-16{height:4rem}.h-40{height:10rem}.h-80{height:20rem}.w-40{width:10rem}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-lg{max-width:32rem}.max-w-md{max-width:28rem}.flex-shrink-0{flex-shrink:0}.cursor-pointer{cursor:pointer}.list-inside{list-style-position:inside}.list-disc{list-style-type:disc}.flex-col{flex-direction:column}.items-center{align-items:center}.items-baseline{align-items:baseline}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-8{gap:2rem}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-16 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(4rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(4rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.scroll-smooth{scroll-behavior:smooth}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-dotted{border-style:dotted}.border-amber-300{--tw-border-opacity:1;border-color:rgb(252 211 77 / var(--tw-border-opacity, 1))}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-gray-500{--tw-border-opacity:1;border-color:rgb(107 114 128 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.bg-amber-100{--tw-bg-opacity:1;background-color:rgb(254 243 199 / var(--tw-bg-opacity, 1))}.bg-cyan-200{--tw-bg-opacity:1;background-color:rgb(165 243 252 / var(--tw-bg-opacity, 1))}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/80{background-color:rgb(255 255 255 / 0.8)}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-4{padding-top:1rem;padding-bottom:1rem}.pb-1{padding-bottom:0.25rem}.pl-3{padding-left:0.75rem}.pr-10{padding-right:2.5rem}.text-left{text-align:left}.text-center{text-align:center}.font-serif{font-family:ui-serif, Georgia, Cambria, "Times New Roman", Times, serif}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.italic{font-style:italic}.tracking-tight{letter-spacing:-0.025em}.text-amber-800{--tw-text-opacity:1;color:rgb(146 64 14 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-red-600{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow-inner{--tw-shadow:inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:inset 0 2px 4px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-emerald-600:hover{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-200:hover{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.hover\:text-gray-900:hover{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity, 1))}.focus\:border-indigo-500:focus{--tw-border-opacity:1;border-color:rgb(99 102 241 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-indigo-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(99 102 241 / var(--tw-ring-opacity, 1))}@media (min-width: 640px){.sm\:p-6{padding:1.5rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:text-5xl{font-size:3rem;line-height:1}.sm\:text-lg{font-size:1.125rem;line-height:1.75rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}}@media (min-width: 768px){.md\:mt-5{margin-top:1.25rem}.md\:block{display:block}.md\:max-w-3xl{max-width:48rem}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:text-6xl{font-size:3.75rem;line-height:1}.md\:text-xl{font-size:1.25rem;line-height:1.75rem}}@media (min-width: 1024px){.lg\:p-8{padding:2rem}.lg\:px-8{padding-left:2rem;padding-right:2rem}}</style></head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-indigo-600">🏆 Mente de Campeón</h1>
+                </div>
+                <nav class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="blob:https://1o6z90f5k12tcsoxflq9p5066w44t94gg4133ghhofzdu8um60-h763805538.scf.usercontent.goog/3a11ca42-2d53-42be-a618-ec6eb8455232#habitos" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Hábitos</a>
+                        <a href="blob:https://1o6z90f5k12tcsoxflq9p5066w44t94gg4133ghhofzdu8um60-h763805538.scf.usercontent.goog/3a11ca42-2d53-42be-a618-ec6eb8455232#herramientas" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Herramientas</a>
+                        <a href="blob:https://1o6z90f5k12tcsoxflq9p5066w44t94gg4133ghhofzdu8um60-h763805538.scf.usercontent.goog/3a11ca42-2d53-42be-a618-ec6eb8455232#diario" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Diario</a>
+                        <a href="blob:https://1o6z90f5k12tcsoxflq9p5066w44t94gg4133ghhofzdu8um60-h763805538.scf.usercontent.goog/3a11ca42-2d53-42be-a618-ec6eb8455232#contrato" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Contrato</a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <section id="hero" class="text-center py-16">
+            <h2 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">Kit de Herramientas para el <span class="text-indigo-600">Atleta Mental</span></h2>
+            <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                Creado por el Lic. Carlos López para ayudarte a controlar tus emociones y alcanzar tu máximo potencial en el tenis de mesa.
+            </p>
+        </section>
+
+        <div class="space-y-16">
+
+            <section id="habitos" class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-2">Comprende y Transforma tu Hábito</h3>
+                <p class="text-center text-gray-600 mb-8">Un hábito tiene tres partes: la señal, la rutina y la recompensa. Para cambiar un mal hábito, debemos mantener la misma señal y recompensa, pero cambiar la rutina.</p>
+                
+                <div class="card-container w-full max-w-lg mx-auto h-80">
+                    <div class="card-inner">
+                        <div class="card-face card-front">
+                            <h4 class="text-xl font-semibold mb-4 text-red-600">Mi Antiguo Ciclo del Hábito</h4>
+                            <div class="text-left w-full">
+                                <p class="mb-2"><strong>Señal:</strong> Cuando fallo un punto...</p>
+                                <p class="mb-2"><strong>Rutina:</strong> Me enojo, salto, lloro...</p>
+                                <p><strong>Recompensa:</strong> Saco la frustración...</p>
+                            </div>
+                        </div>
+                        <div class="card-face card-back">
+                             <h4 class="text-xl font-semibold mb-4 text-green-600">Mi Nueva Rutina Mental</h4>
+                            <div class="text-left w-full">
+                                <p class="mb-2"><strong>Señal:</strong> Cuando fallo un punto...</p>
+                                <p class="mb-2"><strong>Nueva Rutina:</strong> Respiro 3 veces y digo: "Siguiente punto"</p>
+                                <p><strong>Nueva Recompensa:</strong> Me siento tranquila y lista.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-6">
+                    <button id="flipCardBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">
+                        Ver Mi Nueva Rutina
+                    </button>
+                </div>
+            </section>
+
+            <section id="herramientas" class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-8">Herramientas para la Calma</h3>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4 text-center">Respiración Consciente 4-7-8</h4>
+                        <p class="text-center text-gray-600 mb-6">Usa esta técnica para calmarte antes de jugar o entre puntos. Inhala 4s, aguanta 7s, exhala 8s. Repite 3 veces.</p>
+                        <div class="flex flex-col items-center">
+                            <div id="breathingCircle" class="w-40 h-40 bg-cyan-200 rounded-full flex items-center justify-center text-center breathing-circle">
+                                <span id="breathingText" class="text-xl font-semibold text-slate-700">Presiona Iniciar</span>
+                            </div>
+                            <button id="startBreathingBtn" class="mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">Iniciar</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4 text-center">Palabras Ancla</h4>
+                        <p class="text-center text-gray-600 mb-6">Estas son frases cortas que te puedes repetir para mantenerte enfocado y positivo. Haz clic para ver la siguiente.</p>
+                        <div id="anchorCard" class="bg-amber-100 border border-amber-300 h-40 rounded-lg flex items-center justify-center p-4 text-center cursor-pointer shadow-inner">
+                            <p id="anchorText" class="text-2xl font-bold text-amber-800">Siguiente punto</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="diario" class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-2">Diario de Emociones Semanal</h3>
+                <p class="text-center text-gray-600 mb-8">Registra cómo te sientes después de entrenar o competir. Esto te ayudará a ver tu progreso.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">Nuevo Registro</h4>
+                        <form id="emotionForm" class="space-y-4">
+                            <div>
+                                <label for="diaryDay" class="block text-sm font-medium text-gray-700">Día</label>
+                                <select id="diaryDay" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                    <option>Lunes</option>
+                                    <option>Martes</option>
+                                    <option>Miércoles</option>
+                                    <option>Jueves</option>
+                                    <option>Viernes</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="diaryFeeling" class="block text-sm font-medium text-gray-700">¿Cómo me sentí?</label>
+                                <div class="mt-2 flex space-x-4">
+                                    <label class="inline-flex items-center"><input type="radio" name="feeling" value="Feliz" class="text-indigo-600"> <span class="ml-2 text-2xl">😊</span></label>
+                                    <label class="inline-flex items-center"><input type="radio" name="feeling" value="Neutral" class="text-indigo-600"> <span class="ml-2 text-2xl">😐</span></label>
+                                    <label class="inline-flex items-center"><input type="radio" name="feeling" value="Enojado" class="text-indigo-600"> <span class="ml-2 text-2xl">😠</span></label>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition">Añadir al Diario</button>
+                        </form>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">Resumen de tu Semana</h4>
+                        <div class="chart-container">
+                            <canvas id="emotionChart" width="700" height="437" style="display: block; box-sizing: border-box; height: 350px; width: 560px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                 <div id="diaryLog" class="mt-8">
+                    <h4 class="text-lg font-semibold mb-2">Tus Registros:</h4>
+                    <ul id="diaryList" class="list-disc list-inside text-gray-600"></ul>
+                 </div>
+            </section>
+
+            <section id="contrato" class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-8">Contrato de Campeón/a Mental</h3>
+                <div class="max-w-2xl mx-auto bg-slate-100 p-6 rounded-lg border border-slate-200">
+                    <p class="mb-4">Yo, <span id="contractNameDisplay" class="font-bold border-b border-dotted border-gray-500 pb-1">____________________</span>, me comprometo a:</p>
+                    <ul class="list-disc list-inside space-y-2 mb-6">
+                        <li>✅ Reconocer cuando me enojo</li>
+                        <li>✅ Usar mi palabra ancla</li>
+                        <li>✅ Calmarme para seguir jugando</li>
+                    </ul>
+                    <div class="flex justify-between items-center">
+                        <p><strong>Firma:</strong> <span id="contractSignature" class="font-bold font-serif italic">Tu Nombre</span></p>
+                        <p><strong>Fecha:</strong> <span id="contractDate" class="font-bold">4/6/2025</span></p>
+                    </div>
+                </div>
+                <div class="mt-6 max-w-2xl mx-auto">
+                    <label for="userName" class="block text-sm font-medium text-gray-700">Escribe tu nombre para firmar</label>
+                    <input type="text" id="userName" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" placeholder="Tu Nombre Aquí">
+                </div>
+            </section>
+
+        </div>
+    </main>
+    
+    <footer class="bg-gray-800 mt-16">
+        <div class="container mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-white">
+             <p>Material diseñado por: Lic. Carlos López - Psicólogo Deportivo &amp; Entrenador Mental</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Card Flip Logic
+            const flipCardBtn = document.getElementById('flipCardBtn');
+            const cardContainer = document.querySelector('.card-container');
+            flipCardBtn.addEventListener('click', () => {
+                cardContainer.classList.toggle('is-flipped');
+                if (cardContainer.classList.contains('is-flipped')) {
+                    flipCardBtn.textContent = 'Ver Antiguo Hábito';
+                } else {
+                    flipCardBtn.textContent = 'Ver Mi Nueva Rutina';
+                }
+            });
+
+            // Breathing Animator Logic
+            const breathingCircle = document.getElementById('breathingCircle');
+            const breathingText = document.getElementById('breathingText');
+            const startBreathingBtn = document.getElementById('startBreathingBtn');
+            let breathingInterval;
+
+            startBreathingBtn.addEventListener('click', () => {
+                startBreathingBtn.disabled = true;
+                startBreathingBtn.textContent = 'Respirando...';
+                
+                const sequence = [
+                    { state: 'Inhala', duration: 4000, className: 'inhale' },
+                    { state: 'Aguanta', duration: 7000, className: 'hold' },
+                    { state: 'Exhala', duration: 8000, className: 'exhale' }
+                ];
+                let currentStep = 0;
+
+                function runSequence() {
+                    const step = sequence[currentStep];
+                    breathingText.textContent = step.state;
+                    breathingCircle.className = 'w-40 h-40 rounded-full flex items-center justify-center text-center breathing-circle ' + step.className;
+                    
+                    currentStep = (currentStep + 1) % sequence.length;
+                    setTimeout(runSequence, step.duration);
+                }
+                
+                runSequence();
+            });
+
+
+            // Anchor Words Logic
+            const anchorWords = ["Siguiente punto", "Respira y sigue", "Yo soy fuerte", "Calma", "Voy a lograrlo"];
+            let currentAnchorIndex = 0;
+            const anchorCard = document.getElementById('anchorCard');
+            const anchorText = document.getElementById('anchorText');
+
+            function showAnchorWord() {
+                anchorText.textContent = anchorWords[currentAnchorIndex];
+            }
+            showAnchorWord();
+
+            anchorCard.addEventListener('click', () => {
+                currentAnchorIndex = (currentAnchorIndex + 1) % anchorWords.length;
+                showAnchorWord();
+            });
+
+
+            // Emotion Diary & Chart Logic
+            const emotionForm = document.getElementById('emotionForm');
+            const diaryList = document.getElementById('diaryList');
+            const emotionData = { 'Feliz': 0, 'Neutral': 0, 'Enojado': 0 };
+
+            const ctx = document.getElementById('emotionChart').getContext('2d');
+            const emotionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['😊 Feliz', '😐 Neutral', '😠 Enojado'],
+                    datasets: [{
+                        label: 'Frecuencia de Emociones',
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            'rgba(74, 222, 128, 0.6)',
+                            'rgba(251, 191, 36, 0.6)',
+                            'rgba(239, 68, 68, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(74, 222, 128, 1)',
+                            'rgba(251, 191, 36, 1)',
+                            'rgba(239, 68, 68, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            function updateChart() {
+                emotionChart.data.datasets[0].data = [emotionData['Feliz'], emotionData['Neutral'], emotionData['Enojado']];
+                emotionChart.update();
+            }
+
+            emotionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const day = document.getElementById('diaryDay').value;
+                const feelingRadio = document.querySelector('input[name="feeling"]:checked');
+                
+                if (!feelingRadio) {
+                    alert('Por favor, selecciona cómo te sentiste.');
+                    return;
+                }
+                const feeling = feelingRadio.value;
+                
+                emotionData[feeling]++;
+                
+                const listItem = document.createElement('li');
+                listItem.textContent = `${day}: Te sentiste ${feeling}.`;
+                diaryList.appendChild(listItem);
+                
+                updateChart();
+                emotionForm.reset();
+            });
+
+
+            // Contract Logic
+            const userNameInput = document.getElementById('userName');
+            const contractNameDisplay = document.getElementById('contractNameDisplay');
+            const contractSignature = document.getElementById('contractSignature');
+            const contractDate = document.getElementById('contractDate');
+
+            userNameInput.addEventListener('input', (e) => {
+                const name = e.target.value;
+                if(name.trim() !== ''){
+                    contractNameDisplay.textContent = name;
+                    contractSignature.textContent = name;
+                } else {
+                    contractNameDisplay.textContent = '____________________';
+                    contractSignature.textContent = 'Tu Nombre';
+                }
+            });
+
+            contractDate.textContent = new Date().toLocaleDateString('es-ES');
+        });
+    </script>
+
+
+</body></html>
